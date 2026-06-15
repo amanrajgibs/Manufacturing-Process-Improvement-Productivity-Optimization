@@ -1,0 +1,271 @@
+pip install pandas numpy matplotlib seaborn openpyxl
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ==========================================
+# STEP 1: LOAD DATA
+# ==========================================
+
+df = pd.read_csv("garments_worker_productivity.csv")
+
+print("Dataset Shape:", df.shape)
+print(df.head())
+
+# ==========================================
+# STEP 2: DATA CLEANING
+# ==========================================
+
+print("\nMissing Values:")
+print(df.isnull().sum())
+
+df = df.drop_duplicates()
+
+numeric_cols = df.select_dtypes(include=np.number).columns
+
+for col in numeric_cols:
+    df[col] = df[col].fillna(df[col].median())
+
+print("\nCleaning Complete")
+
+# ==========================================
+# STEP 3: KPI CREATION
+# ==========================================
+
+df['productivity_gap'] = (
+    df['targeted_productivity']
+    - df['actual_productivity']
+)
+
+df['achievement_percent'] = (
+    df['actual_productivity']
+    / df['targeted_productivity']
+) * 100
+
+# ==========================================
+# STEP 4: OVERALL KPI SUMMARY
+# ==========================================
+
+print("\n===== KPI SUMMARY =====")
+
+print(
+    "Average Productivity:",
+    round(df['actual_productivity'].mean(),3)
+)
+
+print(
+    "Average Target Productivity:",
+    round(df['targeted_productivity'].mean(),3)
+)
+
+print(
+    "Average Idle Time:",
+    round(df['idle_time'].mean(),2)
+)
+
+print(
+    "Average Overtime:",
+    round(df['overtime'].mean(),2)
+)
+
+# ==========================================
+# STEP 5: DEPARTMENT ANALYSIS
+# ==========================================
+
+dept_analysis = df.groupby(
+    'department'
+)['actual_productivity'].mean().sort_values()
+
+print("\nDepartment Performance")
+print(dept_analysis)
+
+plt.figure(figsize=(8,5))
+dept_analysis.plot(kind='bar')
+plt.title("Department Productivity")
+plt.ylabel("Average Productivity")
+plt.tight_layout()
+plt.show()
+
+# ==========================================
+# STEP 6: TEAM ANALYSIS
+# ==========================================
+
+team_analysis = df.groupby(
+    'team'
+)['actual_productivity'].mean().sort_values()
+
+print("\nTeam Performance")
+print(team_analysis)
+
+plt.figure(figsize=(10,5))
+team_analysis.plot(kind='bar')
+plt.title("Team Productivity")
+plt.ylabel("Average Productivity")
+plt.tight_layout()
+plt.show()
+
+# ==========================================
+# STEP 7: CORRELATION ANALYSIS
+# ==========================================
+
+corr_cols = [
+    'actual_productivity',
+    'targeted_productivity',
+    'idle_time',
+    'over_time',
+    'no_of_workers'
+]
+
+corr = df[corr_cols].corr()
+
+print("\nCorrelation Matrix")
+print(corr)
+
+plt.figure(figsize=(8,6))
+plt.imshow(corr, aspect='auto')
+plt.colorbar()
+
+plt.xticks(
+    range(len(corr.columns)),
+    corr.columns,
+    rotation=45
+)
+
+plt.yticks(
+    range(len(corr.columns)),
+    corr.columns
+)
+
+plt.title("Correlation Matrix")
+plt.tight_layout()
+plt.show()
+
+# ==========================================
+# STEP 8: PARETO ANALYSIS
+# ==========================================
+
+pareto_data = pd.DataFrame({
+    'Cause':[
+        'Idle Time',
+        'Over Time',
+        'Style Change',
+        'Worker Allocation'
+    ],
+    'Impact':[
+        df['idle_time'].sum(),
+        df['over_time'].sum(),
+        df['no_of_style_change'].sum(),
+        df['no_of_workers'].sum()
+    ]
+})
+
+pareto_data = pareto_data.sort_values(
+    by='Impact',
+    ascending=False
+)
+
+pareto_data['Cum_Percent'] = (
+    pareto_data['Impact'].cumsum()
+    / pareto_data['Impact'].sum()
+) * 100
+
+print("\nPareto Table")
+print(pareto_data)
+
+fig, ax1 = plt.subplots(figsize=(8,5))
+
+ax1.bar(
+    pareto_data['Cause'],
+    pareto_data['Impact']
+)
+
+ax2 = ax1.twinx()
+
+ax2.plot(
+    pareto_data['Cause'],
+    pareto_data['Cum_Percent'],
+    marker='o'
+)
+
+ax2.set_ylabel("Cumulative %")
+
+plt.title("Pareto Analysis")
+plt.tight_layout()
+plt.show()
+
+# ==========================================
+# STEP 9: PRODUCTIVITY DISTRIBUTION
+# ==========================================
+
+plt.figure(figsize=(8,5))
+
+plt.hist(
+    df['actual_productivity'],
+    bins=20
+)
+
+plt.title("Actual Productivity Distribution")
+plt.xlabel("Productivity")
+plt.ylabel("Frequency")
+
+plt.show()
+
+# ==========================================
+# STEP 10: BEST & WORST TEAMS
+# ==========================================
+
+best_team = team_analysis.idxmax()
+worst_team = team_analysis.idxmin()
+
+print("\nBest Team:", best_team)
+print("Worst Team:", worst_team)
+
+# ==========================================
+# STEP 11: LEAN SIX SIGMA INSIGHTS
+# ==========================================
+
+print("\n===== IMPROVEMENT RECOMMENDATIONS =====")
+
+if df['idle_time'].mean() > 10:
+    print(
+        "- High idle time detected. Improve scheduling."
+    )
+
+if df['over_time'].mean() > 5000:
+    print(
+        "- Excess overtime observed. Rebalance workforce."
+    )
+
+print(
+    "- Focus training on low-performing teams."
+)
+
+print(
+    "- Reduce style change frequency through batch planning."
+)
+
+print(
+    "- Monitor productivity achievement using KPI dashboard."
+)
+
+# ==========================================
+# STEP 12: EXPORT RESULTS
+# ==========================================
+
+dept_analysis.to_csv(
+    "department_productivity.csv"
+)
+
+team_analysis.to_csv(
+    "team_productivity.csv"
+)
+
+df.to_csv(
+    "processed_productivity_data.csv",
+    index=False
+)
+
+print(
+    "\nAnalysis Complete. Files exported successfully."
+)
