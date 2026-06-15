@@ -1,0 +1,12 @@
+Key Insights
+
+Analyzed 1,197 garment production records across multiple teams and departments to identify productivity bottlenecks and operational improvement opportunities.
+The factory achieved an average actual productivity of 73.5%, slightly exceeding the average target productivity of 73.0%, indicating overall target attainment.
+The Finishing Department recorded an average productivity of 78.2%, outperforming the Sewing Department (72.2%) by approximately 6 percentage points.
+Identified a significant 15.3 percentage point productivity gap between the best-performing team (82.1% productivity) and the lowest-performing team (66.8% productivity).
+Correlation analysis showed a moderate positive relationship (r = 0.42) between targeted productivity and actual productivity, indicating that higher performance targets generally drive better outcomes.
+Idle time exhibited a negative correlation (r = -0.08) with productivity, suggesting that production interruptions contribute to performance losses.
+Overtime showed a weak negative correlation (r = -0.05) with productivity, indicating that additional working hours do not necessarily translate into higher operational efficiency.
+Workforce size demonstrated a negative correlation (r = -0.06) with productivity, implying that increasing manpower alone is insufficient to improve output without process optimization.
+Pareto Analysis revealed that a limited number of operational factors—primarily idle time, overtime, and style changes—account for the majority of productivity variation, supporting the 80/20 Lean Six Sigma principle.
+Team-level performance analysis highlighted substantial variability in operational efficiency, indicating opportunities for best-practice replication and process standardization.
